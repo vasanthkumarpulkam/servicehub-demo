@@ -1,132 +1,128 @@
-# ServiceHub - Service Marketplace Platform
+# ServiceHub
 
-A modern, feature-rich service marketplace connecting customers with trusted service providers.
+**A service marketplace front-end prototype — complete UI and state flows running entirely on mock data.**
+
+[![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white)](https://vitejs.dev)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-38B2AC?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+
+---
+
+## Overview
+
+ServiceHub is a front-end prototype of a two-sided service marketplace: customers post jobs, providers bid, both sides message each other.
+
+**It runs on mock data by design.** There's no backend — the point was to work out the full interaction model, routing and state architecture before committing to a data layer. Firebase is wired in as a dependency and ready to swap in behind the existing context providers.
+
+If you want the production version of this idea with a real backend, see [Housecal Pro](https://github.com/vasanthkumarpulkam/housecal-pro).
+
+## Screenshots
+
+<!-- Add screenshots here:
+![Home](docs/screenshots/home.png)
+![Job detail](docs/screenshots/job-detail.png)
+-->
 
 ## Features
 
-- **User Authentication**: Separate customer and provider accounts with role-based access
-- **Job Management**: Post, browse, and manage service jobs
-- **Bidding System**: Service providers can bid on jobs
-- **Real-time Messaging**: Direct communication between customers and providers
-- **Dashboard**: Role-specific dashboards for customers and providers
-- **Profile Management**: User profiles with ratings and reviews
-- **Category System**: Organized service categories
-- **Responsive Design**: Mobile-friendly interface built with Tailwind CSS
+- **Role-based accounts** — separate customer and provider experiences
+- **Job management** — post, browse, filter and view jobs
+- **Bidding** — providers submit quotes; customers compare them
+- **Messaging** — thread list and chat window
+- **Dashboards** — distinct customer and provider views
+- **Profiles** — ratings and reviews
+- **Categories** — organised service taxonomy with a category grid
+- **Internationalisation** — translation table in `src/data/translations.ts`
+- **Support and legal pages**
+- **Responsive** throughout
 
-## Tech Stack
+## Tech stack
 
-- **Frontend**: React 18 with TypeScript
-- **Build Tool**: Vite
-- **Styling**: Tailwind CSS
-- **Icons**: Lucide React
-- **State Management**: React Context API
-- **Backend Ready**: Firebase integration prepared
+| Layer | Technology |
+|---|---|
+| Framework | React 18 + TypeScript |
+| Build | Vite |
+| Styling | Tailwind CSS |
+| Icons | Lucide React |
+| State | React Context API |
+| Backend | Firebase (dependency present, not yet wired) |
 
-## Project Structure
+## Architecture
+
+State is split across three context providers, each with a matching hook — the seam where a real backend would be introduced:
 
 ```
-├── public/               # Static assets
-├── src/
-│   ├── components/       # Reusable UI components
-│   │   ├── Auth/        # Authentication components
-│   │   ├── Chat/        # Messaging components
-│   │   ├── Dashboard/   # Dashboard components
-│   │   └── Common/      # Shared components
-│   ├── context/         # React Context providers
-│   ├── data/            # Mock data and constants
-│   ├── hooks/           # Custom React hooks
-│   ├── pages/           # Page components
-│   ├── styles/          # CSS files
-│   ├── types/           # TypeScript type definitions
-│   ├── utils/           # Utility functions
-│   ├── App.tsx          # Main app component
-│   └── main.tsx         # App entry point
-└── ...config files
+App
+├── AuthContext   ──► useAuth   ──► user, role, sign in/out
+├── JobContext    ──► useJobs   ──► jobs, bids, post/filter
+└── ChatContext   ──► useChat   ──► threads, messages
+
+Data source: src/data/mockJobs.ts, categories.ts, translations.ts
+             ▲
+             └── replace with Firebase calls; component tree is unchanged
 ```
 
-## Getting Started
+## Getting started
 
 ### Prerequisites
 
-- Node.js 18+ and npm
+- Node.js 18+
 
-### Installation
+### Install and run
 
-1. Clone the repository
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-### Development
-
-Run the development server:
 ```bash
-npm run dev
+git clone https://github.com/vasanthkumarpulkam/servicehub-demo.git
+cd servicehub-demo
+npm install
+npm run dev              # http://localhost:5173
 ```
 
-The app will be available at `http://localhost:5173`
-
-### Build
-
-Build for production:
 ```bash
 npm run build
-```
-
-### Preview Production Build
-
-Preview the production build:
-```bash
 npm run preview
+npm run lint
 ```
 
-## Available Routes
+No environment variables are needed — the app is fully self-contained.
 
-- `/` - Home page
-- `/jobs` - Browse all jobs
-- `/jobs/:id` - Job detail page
-- `/post-job` - Post a new job
-- `/dashboard` - User dashboard (role-based)
-- `/messages` - Messaging center
-- `/profile` - User profile
-- `/settings` - User settings
-- `/how-it-works` - Platform information
-- `/support` - Support center
-- `/legal` - Terms & privacy
-- `/signin` - Sign in
-- `/signup` - Sign up
+## Project structure
 
-## Features in Detail
+```
+servicehub-demo/
+├── src/
+│   ├── components/
+│   │   ├── Auth/         SignIn, SignUp
+│   │   ├── Chat/         ChatThreadList, ChatWindow
+│   │   ├── Dashboard/    CustomerDashboard, ProviderDashboard
+│   │   ├── Common/       HeroSection, CategoryGrid, StatsBar, EmptyState
+│   │   ├── Header.tsx  Footer.tsx  JobCard.tsx
+│   ├── context/          AuthContext, JobContext, ChatContext
+│   ├── hooks/            useAuth, useJobs, useChat
+│   ├── pages/            Home, Jobs, JobDetail, PostJob, Dashboard,
+│   │                     Messages, Profile, Settings, HowItWorks,
+│   │                     Support, Legal
+│   ├── data/             mockJobs, categories, translations
+│   ├── types/            job, bid, message
+│   └── styles/
+└── vite.config.ts
+```
 
-### For Customers
-- Post jobs with detailed requirements
-- Review and accept bids from providers
-- Direct messaging with providers
-- Track job progress
-- Rate and review completed work
+## Connecting a real backend
 
-### For Service Providers
-- Browse available jobs by category
-- Submit competitive bids
-- Showcase skills and portfolio
-- Build reputation through ratings
-- Manage active and completed jobs
+The mock data layer is isolated to `src/data/` and consumed only through the three hooks. To wire up Firebase:
 
-## Future Enhancements
+1. Add your Firebase config and initialise the app
+2. Replace the mock reads inside `useJobs`, `useAuth` and `useChat` with Firestore queries
+3. Leave every component untouched — they only ever talk to the hooks
 
-- React Router for better navigation
-- Firebase/backend integration for real data
-- Payment processing integration
-- Advanced search and filtering
-- File upload for job attachments
-- Email notifications
-- Mobile app version
+## Roadmap
 
-## License
+- [ ] Wire up Firebase Auth and Firestore
+- [ ] Persist bids and messages
+- [ ] File upload for job photos
+- [ ] Payment integration
 
-Private - All rights reserved
+## Author
 
-## Support
-
-For support, email support@servicehub.com or visit the support page.
+**Vasanth Kumar Pulkam** — [GitHub](https://github.com/vasanthkumarpulkam)
